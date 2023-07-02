@@ -121,9 +121,8 @@ class Users {
             $subject = "Account Validation";
             $message = "Click the following link to validate your account: " . $validateLink;
             $this->sendMail($userData['email'], $subject, $message);
-            $_SESSION['status'] = "Registration successful. Please check your email and validate your account.";
-            header("location: /login");
-            exit();
+            var_dump($this->sendMail($userData['email'], $subject, $message));
+            
         } else {
             // Handle database or other errors
             $_SESSION['status'] = "Something went wrong";
@@ -278,6 +277,9 @@ class Users {
                     $subject = "Password Reset";
                     $message = "Click the following link to reset your password: " . $resetLink;
                     $this->sendMail($email, $subject, $message);
+                    $_SESSION['status'] = "Check your email";
+                    header("location: /login");
+                    exit();
                 }else{
                     $_SESSION['status'] = "Could not insert token";
                     header("location: /resetPassword");
@@ -295,9 +297,25 @@ class Users {
         //Create an instance; passing `true` enables exceptions
         $mail = new PHPMailer(true);
         // Read SMTP credentials from secrets.txt
-        $secrets = file('secret.txt', FILE_IGNORE_NEW_LINES);
-        $smtpUsername = $secrets[0];
-        $smtpPassword = $secrets[1];
+
+        // Get the current directory of the script
+        $baseDir = __DIR__;
+
+        // Construct the relative path to the secret file
+        $relativePath = '../controllers/secret.txt';
+
+        // Combine the base directory and relative path to get the full relative file path
+        $filePath = $baseDir . '/' . $relativePath;
+
+        // Read the contents of the file
+        $secrets = file_get_contents($filePath);
+
+        // Split the contents into an array of lines
+        $lines = explode("\n", $secrets);
+
+        // Extract the SMTP username and password from the lines
+        $smtpUsername = isset($lines[0]) ? trim($lines[0]) : '';
+        $smtpPassword = isset($lines[1]) ? trim($lines[1]) : '';
         try {
             //Server settings
             $mail->SMTPDebug = SMTP::DEBUG_SERVER;                      //Enable verbose debug output
@@ -320,8 +338,7 @@ class Users {
             $mail->AltBody =  $message;
 
             $mail->send();
-            header ('location: \login');
-            exit();
+
         } catch (Exception $e) {
             echo "Message could not be sent : {$mail->ErrorInfo}";
         }

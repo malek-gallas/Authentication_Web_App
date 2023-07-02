@@ -1,13 +1,14 @@
 <?php require_once __DIR__ . '/../../includes/header.php'; ?>
 
-    <!-- New password errors -->
-    <div class="errors">
-        <?php echo isset($_SESSION['status']) ? htmlspecialchars($_SESSION['status']) : ''; unset($_SESSION['status']);?>
-    </div>
+    
     <!-- New password form -->
     <div class="login-form">
         <div class="text">
             New Password
+        </div>
+        <!-- New password errors -->
+        <div class="errors">
+            <?php echo isset($_SESSION['status']) ? htmlspecialchars($_SESSION['status']) : ''; unset($_SESSION['status']);?>
         </div>
         <form method="post" action="/Users">
             <input hidden type="text" name="token" value="<?php echo $_GET['token'] ?>"><br><br>
